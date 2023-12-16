@@ -1,4 +1,4 @@
-import discord, random
+import discord, random, re
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -24,7 +24,6 @@ async def rollDie(message, command: str):
     rolls = []
     for i in range(count):
         rolls.append(random.randint(1, sides))
-        print(f"{rolls[i]}")
     total = sum(rolls)
 
     await message.channel.send(f"rolling {count} {sides}-sided dice. \nResults: {rolls} \nSum: {total}")
@@ -35,8 +34,13 @@ async def parseRollsCommand(message):
     command: str = message.content
     commandName: str
     commandInput: str
-    [commandName, commandInput] = command.split(" ", 2)
-    subcommands: list[str] = commandInput.split(r"\+")
+    try:
+        [commandName, commandInput] = command.split(" ", 2)
+    except ValueError:
+        error: str = f"Too many command strings. \nThere should only be a space after .roll, no other spaces"
+        print(error)
+        await message.channel.send(error)
+    subcommands: list[str] = re.split(r"\+|-|\*|\/|\%|\^", commandInput)
     results: list[float] = []
     total: float
     for subcommand in subcommands:
@@ -48,7 +52,28 @@ async def parseRollsCommand(message):
         if subcommand.find("d") != -1:
             result = await rollDie(message, subcommand)
             results.append(result)
-    await message.channel.send(f"Final total: {results}")
+    possibleOperators: str = "+-*/%^"
+    operators: list[str] = []
+    subcommandsIndex: int = 0
+    total: float = results[subcommandsIndex]
+    for character in commandInput:
+        if possibleOperators.find(character) != -1:
+            operators.append(character)
+            subcommandsIndex = subcommandsIndex + 1
+            if character == "+":
+                total = total + results[subcommandsIndex]
+            if character == "-":
+                total = total - results[subcommandsIndex]
+            if character == "*":
+                total = total * results[subcommandsIndex]
+            if character == "/":
+                total = total / results[subcommandsIndex]
+            if character == "%":
+                total = total % results[subcommandsIndex]
+            if character == "^":
+                total = total ^ results[subcommandsIndex]
+    
+    await message.channel.send(f"Final total: {total}")
 
 @client.event
 async def on_ready():
