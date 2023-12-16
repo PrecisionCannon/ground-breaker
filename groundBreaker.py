@@ -16,4 +16,6 @@ async def on_message(message):
     if message.content.startswith(".test"):
         await message.channel.send("Test successful")
 
-client.run("MTE4NTQ4MjEwNTI0NTk0MTgyMg.GT60JS.bKQ6_NXFw0kSI40ues_hkWGL2SOBU76I3BeEOQ")
+tokenFile = open("token.txt")
+token: str = tokenFile.read()
+client.run(token)
