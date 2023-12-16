@@ -1,4 +1,5 @@
 import discord, random, re
+from operator import add, sub, mul, truediv, mod, pow
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -30,6 +31,19 @@ async def rollDie(message, command: str):
 
     return total
 
+async def applyOperator(message, results: list[float], operators: list[str], operator):
+    operatorKeys = {"+": add, "-": sub, "*": mul, "/": truediv, "%": mod, "^": pow}
+    i = 0
+    while i < len(operators):
+        if operatorKeys[operators[i]] == operator:
+            results[i] = operator(results[i], results[i+1])
+            print(f"result {i} is now {results[i]}")
+            results.pop(i+1)
+            operators.pop(i)
+        else:
+            i = i + 1
+    return results
+
 async def parseRollsCommand(message):
     command: str = message.content
     commandName: str
@@ -54,26 +68,17 @@ async def parseRollsCommand(message):
             results.append(result)
     possibleOperators: str = "+-*/%^"
     operators: list[str] = []
-    subcommandsIndex: int = 0
-    total: float = results[subcommandsIndex]
     for character in commandInput:
         if possibleOperators.find(character) != -1:
             operators.append(character)
-            subcommandsIndex = subcommandsIndex + 1
-            if character == "+":
-                total = total + results[subcommandsIndex]
-            if character == "-":
-                total = total - results[subcommandsIndex]
-            if character == "*":
-                total = total * results[subcommandsIndex]
-            if character == "/":
-                total = total / results[subcommandsIndex]
-            if character == "%":
-                total = total % results[subcommandsIndex]
-            if character == "^":
-                total = total ^ results[subcommandsIndex]
+    results = await applyOperator(message, results, operators, pow)
+    results = await applyOperator(message, results, operators, mul)
+    results = await applyOperator(message, results, operators, truediv)
+    results = await applyOperator(message, results, operators, mod)
+    results = await applyOperator(message, results, operators, add)
+    results = await applyOperator(message, results, operators, sub)
     
-    await message.channel.send(f"Final total: {total}")
+    await message.channel.send(f"Final results: {results}")
 
 @client.event
 async def on_ready():
