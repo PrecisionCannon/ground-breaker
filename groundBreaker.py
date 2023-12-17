@@ -6,6 +6,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 client = discord.Client(intents=intents)
+voiceClient: discord.voice_client = None
 
 @client.event
 async def on_ready():
@@ -22,7 +23,10 @@ async def on_message(message):
     if message.content.startswith(".roll"):
         await groundBreakerDice.parseRollsCommand(message)
     if message.content.startswith(".connect"):
-        await groundBreakerVoice.parseConnectCommand(message)
+        voiceClient = await groundBreakerVoice.parseConnectCommand(message)
+    if message.content.startswith(".play"):
+        await groundBreakerVoice.parsePlayCommand(message, voiceClient)
+        
         
 
 tokenFile = open("token.txt")
