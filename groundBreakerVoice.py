@@ -8,7 +8,7 @@ async def connectToUser(message: message, member: member):
         return
     try:
         voiceClient = await voiceStatus.channel.connect()
-        await message.channel.send(f"Connected to {voiceStatus.channel}")
+        await message.channel.send(f"Connected to `{voiceStatus.channel}`")
     except:
         await message.channel.send("Problem connecting")
 
