@@ -16,8 +16,10 @@ async def on_message(message):
     if message.author == client.user:
         return
     if message.content.startswith(".roll"):
-        result = await groundBreakerDice.parseRollsCommand(message)
-        #await message.channel.send(result)
+        await groundBreakerDice.parseRollsCommand(message)
+    if message.content.startswith(".connect"):
+        await groundBreakerVoice.parseConnectCommand(message)
+        
 
 tokenFile = open("token.txt")
 token: str = tokenFile.read()
