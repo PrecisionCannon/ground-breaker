@@ -12,6 +12,8 @@ async def rollDie(message, command: str):
 
     try:
         [count, sides] = command.split("d", 2)
+        if count == "":
+            count = 1
         count = float(count)
         if count % 1 == 0:
             count = int(count)
@@ -37,7 +39,6 @@ async def applyOperator(message, results: list[float], operators: list[str], ope
     while i < len(operators):
         if operatorKeys[operators[i]] == operator:
             results[i] = operator(results[i], results[i+1])
-            print(f"result {i} is now {results[i]}")
             results.pop(i+1)
             operators.pop(i)
         else:
@@ -45,7 +46,7 @@ async def applyOperator(message, results: list[float], operators: list[str], ope
     return results
 
 async def parseRollsCommand(message):
-    command: str = message.content
+    command: str = message.content.lower()
     commandName: str
     commandInput: str
     try:
