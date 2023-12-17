@@ -1,6 +1,6 @@
 import discord
 
-import groundBreakerDice
+import groundBreakerDice, groundBreakerVoice
 
 intents = discord.Intents.default()
 intents.message_content = True
